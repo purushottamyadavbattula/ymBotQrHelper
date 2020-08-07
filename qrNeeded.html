@@ -84,6 +84,7 @@
         const fileQrResult = document.getElementById('file-qr-result');
 
         function setResult(label, result) {
+            console.log(result)
             label.textContent = result; 
             camQrResultTimestamp.textContent = new Date().toString();
             label.style.color = 'teal';
@@ -97,9 +98,8 @@
         QrScanner.hasCamera().then(hasCamera => camHasCamera.textContent = hasCamera);
 
         const scanner = new QrScanner(video, result => 
-        { console.log(result)
+        { 
             setResult(camQrResult, result) 
-            console.log(result)
         }, error => {
             camQrResult.textContent = error;
             camQrResult.style.color = 'inherit';
