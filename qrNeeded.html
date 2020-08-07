@@ -75,28 +75,8 @@
 
         function setResult(label, result) {
             console.log(result)
-            //YM API event hit
-            var myHeaders = new Headers();
-            myHeaders.append("Content-Type", "application/json");
-
-            var raw = JSON.stringify({ "from": "11870939213105351116936069", "to": "x1596784257821", "message": { "qr": "data" } });
-
-            var requestOptions = {
-                method: 'POST',
-                headers: myHeaders,
-                body: raw,
-                redirect: 'follow'
-            };
-
-            fetch("https://app.yellowmessenger.com/integrations/yellowmessenger/receive", requestOptions)
-                .then(response => response.text())
-                .then(result => console.log(result))
-                .catch(error => console.log('error', error));
-            //up tohere
-            // camQrResultTimestamp.textContent = new Date().toString();
-            // label.style.color = 'teal';
-            // clearTimeout(label.highlightTimeout);
-            // label.highlightTimeout = setTimeout(() => label.style.color = 'inherit', 100);
+            window.location=`https://bot-test-x1588762126437.herokuapp.com/send?to=x1596784257821&from=11870939213105351116936069&qr=${result}`
+            
         }
 
         // ####### Web Cam Scanning #######
@@ -107,6 +87,7 @@
         const scanner = new QrScanner(video, result => {
             console.log("found result")
             setResult(camQrResult, result)
+            QrScanner.destroy()
         }, error => {
 
         });
