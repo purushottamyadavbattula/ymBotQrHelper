@@ -4,10 +4,28 @@
 <head>
     <meta charset="UTF-8">
     <title>QR Scanner Demo</title>
+    <!-- CSS only -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+    <!-- JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+        crossorigin="anonymous"></script>
 </head>
 
 <body>
     <style>
+        h1 {
+            text-align: center;
+        }
+
         hr {
             margin-top: 32px;
         }
@@ -25,50 +43,18 @@
             display: none;
         }
     </style>
-    <h1>Scan from WebCam:</h1>
-    <div>
-        <b>Device has camera: </b>
-        <span id="cam-has-camera"></span>
-        <br>
-        <b>Device has flash: </b>
-        <span id="cam-has-flash"></span>
-        <br>
-        <video id="qr-video"></video>
-        <br>
-        <label>
-            <input id="show-scan-region" type="checkbox">
-            Show scan region
-        </label>
-    </div>
-    <div>
-        <button id="flash-toggle">📸 Flash: <span id="flash-state">off</span></button>
-    </div>
-    <div>
-        <select id="inversion-mode-select">
-            <option value="original">Scan original (dark QR code on bright background)</option>
-            <option value="invert">Scan with inverted colors (bright QR code on dark background)</option>
-            <option value="both">Scan both</option>
-        </select>
-        <br>
-    </div>
-    <b>Detected QR code: </b>
-    <span id="cam-qr-result">None</span>
-    <br>
-    <b>Last detected at: </b>
-    <span id="cam-qr-result-timestamp"></span>
-    <br>
-    <button id="start-button">Start</button>
-    <button id="stop-button">Stop</button>
-    <hr>
+    <h1>Place your QR here</h1>
+    <div class="container">
 
-    <h1>Scan from File:</h1>
-    <input type="file" id="file-selector">
-    <b>Detected QR code: </b>
-    <span id="file-qr-result">None</span>
+        <div class="d-flex justify-content-center">
+            <video id="qr-video" width="300" ,height="300"></video>
+        </div>
+    </div>
 
-    <script>
-        console.log("test log")
-    </script>
+    <div>
+
+    </div>
+
     <script type="module">
         // import QrScanner from "../qr-scanner.min.js";
         // QrScanner.WORKER_PATH = '../qr-scanner-worker.min.js';
@@ -78,41 +64,55 @@
 
 
         const video = document.getElementById('qr-video');
-        const camHasCamera = document.getElementById('cam-has-camera');
-        const camHasFlash = document.getElementById('cam-has-flash');
+        // const camHasCamera = document.getElementById('cam-has-camera');
+        // const camHasFlash = document.getElementById('cam-has-flash');
         const flashToggle = document.getElementById('flash-toggle');
         const flashState = document.getElementById('flash-state');
         const camQrResult = document.getElementById('cam-qr-result');
         const camQrResultTimestamp = document.getElementById('cam-qr-result-timestamp');
-        const fileSelector = document.getElementById('file-selector');
-        const fileQrResult = document.getElementById('file-qr-result');
+        // const fileSelector = document.getElementById('file-selector');
+        // const fileQrResult = document.getElementById('file-qr-result');
 
         function setResult(label, result) {
-            console.log("came to set result")
             console.log(result)
-            label.textContent = result; 
-            camQrResultTimestamp.textContent = new Date().toString();
-            label.style.color = 'teal';
-            clearTimeout(label.highlightTimeout);
-            label.highlightTimeout = setTimeout(() => label.style.color = 'inherit', 100);
+            //YM API event hit
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+            var raw = JSON.stringify({ "from": "11870939213105351116936069", "to": "x1596784257821", "message": { "qr": "data" } });
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: raw,
+                redirect: 'follow'
+            };
+
+            fetch("https://app.yellowmessenger.com/integrations/yellowmessenger/receive", requestOptions)
+                .then(response => response.text())
+                .then(result => console.log(result))
+                .catch(error => console.log('error', error));
+            //up tohere
+            // camQrResultTimestamp.textContent = new Date().toString();
+            // label.style.color = 'teal';
+            // clearTimeout(label.highlightTimeout);
+            // label.highlightTimeout = setTimeout(() => label.style.color = 'inherit', 100);
         }
 
         // ####### Web Cam Scanning #######
 
         //setting value for has camera to the device
-        QrScanner.hasCamera().then(hasCamera => camHasCamera.textContent = hasCamera);
+        // QrScanner.hasCamera().then(hasCamera => camHasCamera.textContent = hasCamera);
 
-        const scanner = new QrScanner(video, result => 
-        { 
+        const scanner = new QrScanner(video, result => {
             console.log("found result")
-            setResult(camQrResult, result) 
+            setResult(camQrResult, result)
         }, error => {
-            camQrResult.textContent = error;
-            camQrResult.style.color = 'inherit';
+
         });
         scanner.start().then(() => {
             scanner.hasFlash().then(hasFlash => {
-                camHasFlash.textContent = hasFlash;
+                // camHasFlash.textContent = hasFlash;
                 if (hasFlash) {
                     flashToggle.style.display = 'inline-block';
                     flashToggle.addEventListener('click', () => {
@@ -125,36 +125,7 @@
         // for debugging
         window.scanner = scanner;
 
-        document.getElementById('show-scan-region').addEventListener('change', (e) => {
-            const input = e.target;
-            const label = input.parentNode;
-            label.parentNode.insertBefore(scanner.$canvas, label.nextSibling);
-            scanner.$canvas.style.display = input.checked ? 'block' : 'none';
-        });
 
-        document.getElementById('inversion-mode-select').addEventListener('change', event => {
-            scanner.setInversionMode(event.target.value);
-        });
-
-        document.getElementById('start-button').addEventListener('click', () => {
-            scanner.start();
-        });
-
-        document.getElementById('stop-button').addEventListener('click', () => {
-            scanner.stop();
-        });
-
-        // ####### File Scanning #######
-
-        fileSelector.addEventListener('change', event => {
-            const file = fileSelector.files[0];
-            if (!file) {
-                return;
-            }
-            QrScanner.scanImage(file)
-                .then(result => setResult(fileQrResult, result))
-                .catch(e => setResult(fileQrResult, e || 'No QR code found.'));
-        });
 
     </script>
 </body>
