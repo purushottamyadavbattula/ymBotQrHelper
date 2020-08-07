@@ -47,7 +47,7 @@
     <div class="container">
 
         <div class="d-flex justify-content-center">
-            <video id="qr-video" width="300" ,height="300"></video>
+            <video id="qr-video" width="100%" ,height="100%"></video>
         </div>
     </div>
 
@@ -56,6 +56,11 @@
     </div>
 
     <script type="module">
+        console.log("data", window.location.search)
+        const urlParams = new URLSearchParams(window.location.search);
+        console.log(urlParams.get("name"))
+        let from=urlParams.get("from")//from
+        let to=urlParams.get("to")//x1596784257821
         // import QrScanner from "../qr-scanner.min.js";
         // QrScanner.WORKER_PATH = '../qr-scanner-worker.min.js';
         console.log("Executing script")
@@ -75,8 +80,8 @@
 
         function setResult(label, result) {
             console.log(result)
-            window.location=`https://bot-test-x1588762126437.herokuapp.com/send?to=x1596784257821&from=11870939213105351116936069&qr=${result}`
-            
+            window.location = `https://bot-test-x1588762126437.herokuapp.com/send?to=${to}&from=${from}&qr=${result}`
+
         }
 
         // ####### Web Cam Scanning #######
